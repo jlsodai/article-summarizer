@@ -3,9 +3,9 @@
 
 import { RxChevronRight, RxGithubLogo } from "react-icons/rx";
 import { IoLinkOutline, IoReturnDownBackSharp } from "react-icons/io5";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { fetchData } from "../fetchData";
-import Markdown from "markdown-to-jsx";
+import Typed from "typed.js";
 
 const SummarySection = () => {
 	const [article, setArticle] = useState({
@@ -14,7 +14,6 @@ const SummarySection = () => {
 	});
 
 	const [isLoading, setLoading] = useState(false);
-	const [error, setError] = useState("");
 
 	const handleSubmit = async (e: FormEvent) => {
 		setLoading(true);
@@ -28,7 +27,19 @@ const SummarySection = () => {
 		setLoading(false);
 	};
 
-	const summary = [...Array(4)];
+	const el = useRef(null);
+
+	useEffect(() => {
+		const typed = new Typed(el.current, {
+			strings: [article.summary],
+			typeSpeed: 10,
+		});
+
+		return () => {
+			// Destroy Typed instance during cleanup to stop animation
+			typed.destroy();
+		};
+	}, [article.summary]);
 
 	return (
 		<>
@@ -91,9 +102,10 @@ const SummarySection = () => {
 						<img src="/loader.svg" alt="Loading..." width="100px" />
 					) : (
 						<div className="overflow-y-auto prose prose-sm">
-							<Markdown className="text-gray-400 -mt-5 ">
-								{article.summary}
-							</Markdown>
+							<span
+								className="text-gray-200 whitespace-pre-wrap"
+								ref={el}
+							/>
 						</div>
 					)}
 				</div>
